@@ -1,0 +1,291 @@
+---
+title: "Basic Data Visualization using ggplot, PART 1"
+output:
+  html_document:
+    df_print: paged
+---
+
+One thing that needs to be mentioned here is that R has got various datasets available under various packages. We shall see some here. For which we import the library od datasets first,change it into a data frame to get the results into the R-notebook. 
+
+```{r}
+library(datasets)
+library(datasets.load)
+View(datasets())
+data=data.frame(datasets())
+data
+```
+
+Let us now see what are the available datasets under the ggplot2 package. 
+
+```{r}
+ggplot2datas=subset(data, data$Package=="ggplot2")
+ggplot2datas
+```
+
+
+<!-- From these available datasets under ggplot2, let us find out the dimensions of each datasets and accordingly we shall decide upon the selection of the database for our purpose of visualization.  -->
+
+<!-- ```{r} -->
+<!-- library(ggplot2) -->
+<!-- dim_list=list() -->
+<!-- dim_list[1]=dim(diamonds) -->
+<!-- dim_list[2]=dim(economics) -->
+<!-- dim_list[3]=dim(economics_long) -->
+<!-- dim_list[4]=dim(faithfuld) -->
+<!-- dim_list[5]=dim(luv_colours) -->
+<!-- dim_list[6]=dim(midwest) -->
+<!-- dim_list[7]=dim(mpg) -->
+<!-- dim_list[8]=dim(msleep) -->
+<!-- dim_list[9]=dim(presidential) -->
+<!-- dim_list[10]=dim(seals) -->
+<!-- dim_list[11]=dim(txhousing) -->
+<!-- dim_list -->
+<!--  # for (i in length(ggplot2datas$Package))  -->
+<!--  #   { -->
+<!--  #   l=list() -->
+<!--  #   l[i]=dim(data(ggplot2datas$Item)) -->
+<!--  # } -->
+<!--  # l -->
+<!-- ``` -->
+
+We see that the ggplot package has got different datasets for various purposes. We shall be using the "txhousing" data set for the purpose of vizualisation. 
+
+txhousing: a data frame with 8602 observations and 9 variables:</br>
+
+city : Name of multiple listing service (MLS) area</br>
+year,month,date : Date, seperately mentioned just</br>
+sales : Number of sales</br>
+volume: Total value of sales</br>
+median: Median sale price</br>
+listings: Total active listings</br>
+inventory: "Months inventory": amount of time it would take to sell all current listings at current pace of sales.<br>
+
+
+```{r}
+library(ggplot2)
+head(txhousing)
+```
+
+Lets denote the ggplot global function as g and we shall keep adding various layers to it.
+
+
+```{r}
+#options(scipen = 999) # this turns the exponential dentation to numbers, however is not reqd. here.  
+g <-ggplot(txhousing, aes(x=sales , y=volume))
+g1=g+geom_point(na.rm=T)+ # removing the missing values in the data without an warning
+   geom_smooth(na.rm=T)
+g1
+```
+
+In the above plot we have plotted the sales against Volume of the money it is sold in, and it shows a nearly linear realtion. We have used geom_smooth to fit a smooth curve to the plot, and the path nearly shows a linear relationship.
+
+#### A. Xlim and Ylim specifications
+
+We see that the points in the abov graph is very congested, to view the graph in a better format we can implement two ways: </br>
+1. Limit the axes : by using xlim ylim seperately</br>
+2. Zoom out : by using coord_cartesian </br>
+
+```{r}
+g1+xlim(c(0,500))+ ylim(c(0,10000000)) 
+```
+
+This is how a very small part in the beginning seperately looks like, we see that the volumn increases very rapidly ( a must steeper line) as sales initially grow from 0 to 100, however we have seen the entire graph shows a more proportionate line (of slope nearly 1). The concentration of the points show that, daywise sales between 0 to 2500 causing volume between 0 to 1000000000 are more common. 
+
+In this graph however, we have plotted only the points restricted in the particular limit, so the geom_smooth shows a different bend unlike the entire graph.
+Let us now see the same by zooming in. 
+
+```{r}
+g1+ coord_cartesian(xlim=c(0,500), ylim=c(0,10000000)) 
+```
+
+As we can see in this graph, it provides a more holistic view of the graph, it simply zooms the graph to our mentioned limits. Hence the geom_smooth shows the same path as the main graph, i.e. its property remains intact. 
+
+#### B. Title and axis labels
+
+```{r}
+g2=g1+ labs(title = "Relationship of sales Vs Volume", subtitle = "Curve fitting using geom_smooth", 
+         x= "Sales per day", y="Volume of the total sale", caption = "Obviously it should show a nearly linear relationship")
+
+g2
+
+#or
+
+```
+
+```{r}
+g1+ ggtitle("Relationship of sales Vs Volume", subtitle = "Curve fitting using geom_smooth") +
+  xlab("Sales per day" )+ ylab("Volume of the total sale")
+
+```
+
+
+Now the plot has become enough self descriptive in itself. 
+
+#### C. changing color and size of statistic
+
+```{r}
+gg=ggplot(txhousing, aes(x=sales , y=volume))+
+geom_point(na.rm=T, aes(colour=year))+ 
+   geom_smooth(na.rm=T, color="red")+
+  labs(title = "Relationship of sales Vs Volume", subtitle = "Curve fitting using geom_smooth", 
+         x= "Sales per day", y="Volume of the total sale", caption = "Obviously it should show a nearly linear relationship", color="red")
+gg
+```
+
+We see here that year is a continuous variable hence we can see a continuous colour palatte. This colour palatte can be changed according to various available colour palattes, also the legend can be removed by using "gg+theme(legend.position="none"). Lets see. 
+
+```{r}
+gg+theme(legend.position = "None") # removing legend
+```
+
+
+#### D. Using colour palettes in ggplot
+
+The various sets from the color palette are meant for discrete scale so let us check this with another dataset which have more discrete values. Using dataset midwest. 
+
+```{r}
+ggplot(midwest, aes(x=area, y=poptotal)) + 
+  geom_point(aes(col=state), size=3) +  # Set color to vary based on state categories.
+  geom_smooth(method="lm", col="firebrick", size=2) + 
+  coord_cartesian(xlim=c(0, 0.1), ylim=c(0, 1000000)) + 
+  labs(title="Area Vs Population", subtitle="From midwest dataset", y="Population", x="Area",    caption="Midwest Demographics")+ 
+  scale_colour_brewer(palette = "Set1")  # change color palette
+```
+
+Let us now check all the colour palettes that are available in the "RcolorBrewer" package. The Rcolorbrewer, has quiet a lot of features to make the plot interesting. ?Rcolorbrewer will provide with all necessary details however, let me provide a gist imformation in here. 
+
+Rcolorbrewer primarily creates a nice looking color palettes especially for thematic maps. 
+Five main tools to find out are: </br>
+
+brewer.pal: makes the color palettes from ColorBrewer available as R palettes.
+
+display.brewer.pal(): displays the selected palette in a graphics window.
+
+display.brewer.all(): displays the a few palettes simultanueously in a graphics window.
+
+brewer.pal.info: returns information about the available palettes as a dataframe. brewer.pal.info is not a function, it is a changeable variable.
+
+There are 3 types of palettes, sequential, diverging, and qualitative.
+
+1. *Sequential palettes* _are suited to ordered data that progress from low to high. Lightness steps dominate the look of these schemes, with light colors for low data values to dark colors for high data values._ </br>
+
+2. *Diverging palettes* _put equal emphasis on mid-range critical values and extremes at both ends of the data range. The critical class or break in the middle of the legend is emphasized with light colors and low and high extremes are emphasized with dark colors that have contrasting hues._ </br>
+
+3. *Qualitative palettes* _do not imply magnitude differences between legend classes, and hues are used to create the primary visual differences between classes. Qualitative schemes are best suited to representing nominal or categorical data._ </br>
+
+*The sequential palettes names are* </br>
+_Blues BuGn BuPu GnBu Greens Greys Oranges OrRd PuBu PuBuGn PuRd Purples RdPu Reds YlGn YlGnBu YlOrBr YlOrRd_
+
+All the sequential palettes are available in variations from 3 different values up to 9 different values.
+
+*The diverging palettes are* </br>
+_BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral_
+
+All the diverging palettes are available in variations from 3 different values up to 11 different values.
+
+For *qualitative palettes*, the lowest number of distinct values available always is 3, but the largest number is different for different palettes. It is given together with the palette names in the following table.
+
+_Accent	8_ </br>
+_Dark2	8_ </br>
+_Paired	12_ </br>
+_Pastel1	9_ </br>
+_Pastel2	8_ </br>
+_Set1	9_ </br>
+_Set2	8_ </br>
+_Set3	12_ </br>
+
+Next we ahve displayed the various types of palettes and sets. 
+
+```{r}
+library(RColorBrewer) 
+head(brewer.pal.info) #displaying the data frame
+```
+```{r}
+display.brewer.pal(11, "BrBG") # tge arguements are (n,"color name"), color names as in the prev table
+```
+
+```{r}
+display.brewer.all(type="div") # displaying the palettes catagorywise
+```
+
+```{r}
+display.brewer.all(type="seq")
+```
+
+```{r}
+display.brewer.all(type= "qual")
+```
+
+```{r}
+display.brewer.all(n=10, exact.n = F) # exact.n=T displays only those palettes that have 10 colours.
+```
+
+It is recommended that last plot should be viewed in a seperate window to clearly understand the divisions. 
+
+
+#### E. *Changing the x and y axis text and location*
+
+Here we shall see two aspects: breaks and labels
+
+_Step 1_ : Set the breaks </br>
+The breaks should be of the same scale as the x axis variable. There are various available functions for changing various attributes, however we will use particularly scale_x_continuous() as the x_axis is continuous. There are various other scale x options.
+
+
+```{r}
+options(scipen=999) # when we dont want the labels to be in the form of exponents. 
+g2 + scale_x_continuous(breaks=seq(0,10000, 1000))+ # changing x axis breaks.
+  scale_y_continuous(breaks = seq(0,4000000000,500000000)) # changing the y axis breaks.
+```
+
+The previous graph definitely creates better understandability. 
+
+
+_Step 2_ : *Change the labels* One can optionally change the labels at the axis ticks. labels take a vector of the same length as breaks.
+
+```{r}
+g3=g2 + scale_x_continuous(breaks=seq(0,10000, 1000))+ # changing x axis breaks.
+  scale_y_continuous(breaks = seq(0,3000000000,500000000), labels = letters[1:7])  # changing the y axis breaks.
+g3
+```
+
+```{r}
+g2 + scale_y_reverse() # reverses the y axis scale.
+```
+
+#### F. *Writing customised text for axis labels*
+
+In the plots we have seen so far that the y-axis looks very clumpsy, The number of 0's in the y label is difficult to decipher. We can customise the y labels by mentioning in terms of crore. Lets see how.
+
+```{r}
+g2= g1 +
+  scale_x_continuous(breaks=seq(0,10000, 1000))+ # changing x axis breaks.
+  scale_y_continuous(breaks = seq(0,3000000000,500000000), labels = function(x){paste0(x/10000000,'Cr')})
+g2  
+```
+
+#### G. *Customizing the Entire Theme using Pre-Built Themes*
+
+Finally, instead of changing the theme components individually (as we discussed previously), we can change the entire theme itself using pre-built themes. The help page ?theme_bw shows all the available built-in themes.
+
+This again is commonly done in couple of ways. *Use the theme_set() to set the theme before drawing the ggplot.* Note that this setting will affect all future plots. *Draw the ggplot and then add the overall theme setting* (eg. theme_bw())
+
+method 1: Using theme_set() </br>
+# theme_set(theme_classic())  </br>
+# g3
+
+Method 1 sets the theme_Classic() to all future plots by default, method 2 manually creates the same.  
+
+```{r}
+# method 2: Adding theme Layer itself.
+gg + theme_bw() + labs(subtitle="BW Theme")
+```
+
+
+```{r}
+#theme classic
+gg + theme_classic() + labs(subtitle="Classic Theme")
+
+```
+
+This is all. 
+
