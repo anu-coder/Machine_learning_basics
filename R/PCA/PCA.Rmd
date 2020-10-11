@@ -1,0 +1,287 @@
+<<<<<<< HEAD
+---
+title: "PCA"
+output:
+  html_document:
+    df_print: paged
+---
+
+Here we shall be applying PCA (Principal Component Analysis) to a data set, and stepwise show how the PCA is calculated in general, using inbuilt functions prcomp, princomp. 
+
+Arguements taken by function prcomp: 
+
+formula: formula with no respomse variable refering only to numeric value. </br>
+data: an optional data frame containing the variables from the formula </br>
+
+the default is:
+
+x: a numeric matrix or data frame </br>
+scale: a logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place
+
+Arguements takn by the function princomp: 
+
+x: a numeric matrix or data frame </br>
+cor: a logical value. If TRUE, the data will be centered and scaled before the analysis </br>
+scores: a logical value. If TRUE, the coordinates on each principal component are calculated
+
+The elements of the outputs returned by the functions prcomp() and princomp() includes :
+
+```{r}
+read.csv("required.csv", header = T)
+```
+
+Now we shall work with two different datasets. 
+
+
+```{r}
+data=read.table("pcadatawin.txt", header = T) # this is a imported data set.
+head(data)
+```
+
+The dimension of the data set are as follows. 
+
+```{r}
+dim(data) 
+```
+
+Let us try to visualize the data. To obtain a 3D visualization we shall first </br>
+1. Install a package called "devtools"
+2. Then we use devtools::install_github("AckerDWM/gg3D") which downloads the gg3D directly from github repository AckerDWM. 
+
+This package is useful in giving 3D plots showing 3 axes. The following example gives and empty plot.
+
+
+```{r}
+
+library("gg3D")
+
+## An empty plot with 3 axes
+qplot(x=0, y=0, z=0, geom="blank") + 
+  theme_void() +
+  axes_3D()
+
+```
+
+This will give the necessary 3D representation the data points for iris dataset, and the imported data set respectively.  
+
+```{r}
+data(iris)
+ggplot(iris, aes(x=Petal.Width, y=Sepal.Width, z=Petal.Length, color=Species)) + 
+  theme_void() +
+  axes_3D() +
+  stat_3D()
+
+```
+
+```{r}
+ggplot(data, aes(x=x, y=y, z=z)) + 
+  theme_void() +
+  axes_3D() +
+  stat_3D()
+
+```
+
+The last three plots give a visualization of the data, The first plot shows that the data is spread in the x-y plane and partly in the z axis, the second plot for the other set of data shows that the points are spread mostly in the x-y plane. This gives a intuition about what can be the Principal components. Next we shall apply "prcomp()" to find out the PCs and the the scree plot for both the set of datas. 
+
+```{r}
+library(factoextra)
+pc=prcomp(data, scale= FALSE)
+pc
+```
+```{r}
+pc1=princomp(data, scores = TRUE) #using princomp
+pc1
+
+```
+```{r}
+names(pc1)
+```
+
+
+```{r}
+names(pc)
+
+```
+
+We see that both prcomp and princomp gives nearly the same values. x in prcomp are the scores in primcomp. 
+
+```{r}
+pc_plotdata=data.frame(v=pc$sdev)^2
+ggplot(data=pc_plotdata)+
+  geom_col(mapping = aes(x=c(1,2,3), y=v)) #same as bar taking stat= "identity by default
+```
+
+```{r}
+fviz_eig(pc, addlabels = TRUE)
+```
+
+```{r}
+fviz_screeplot(pc, choice="eigenvalue", 
+               barfill= "blue", addlabels= TRUE)
+```
+Now working with IRIS dataset. 
+
+
+```{r}
+iris1=iris[-5]
+pc=prcomp(iris1, scale= FALSE)
+pc
+
+```
+
+```{r}
+pc1=princomp(iris1, scores = TRUE) #using princomp
+pc1
+
+```
+
+```{r}
+fviz_screeplot(pc1, choice="eigenvalue", 
+               barfill= "blue", addlabels= TRUE)
+
+```
+
+=======
+---
+title: "PCA"
+output:
+  html_document:
+    df_print: paged
+---
+
+Here we shall be applying PCA (Principal Component Analysis) to a data set, and stepwise show how the PCA is calculated in general, using inbuilt functions prcomp, princomp. 
+
+Arguements taken by function prcomp: 
+
+formula: formula with no respomse variable refering only to numeric value. </br>
+data: an optional data frame containing the variables from the formula </br>
+
+the default is:
+
+x: a numeric matrix or data frame </br>
+scale: a logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place
+
+Arguements takn by the function princomp: 
+
+x: a numeric matrix or data frame </br>
+cor: a logical value. If TRUE, the data will be centered and scaled before the analysis </br>
+scores: a logical value. If TRUE, the coordinates on each principal component are calculated
+
+The elements of the outputs returned by the functions prcomp() and princomp() includes :
+
+```{r}
+read.csv("required.csv", header = T)
+```
+
+Now we shall work with two different datasets. 
+
+
+```{r}
+data=read.table("pcadatawin.txt", header = T) # this is a imported data set.
+head(data)
+```
+
+The dimension of the data set are as follows. 
+
+```{r}
+dim(data) 
+```
+
+Let us try to visualize the data. To obtain a 3D visualization we shall first </br>
+1. Install a package called "devtools"
+2. Then we use devtools::install_github("AckerDWM/gg3D") which downloads the gg3D directly from github repository AckerDWM. 
+
+This package is useful in giving 3D plots showing 3 axes. The following example gives and empty plot.
+
+
+```{r}
+
+library("gg3D")
+
+## An empty plot with 3 axes
+qplot(x=0, y=0, z=0, geom="blank") + 
+  theme_void() +
+  axes_3D()
+
+```
+
+This will give the necessary 3D representation the data points for iris dataset, and the imported data set respectively.  
+
+```{r}
+data(iris)
+ggplot(iris, aes(x=Petal.Width, y=Sepal.Width, z=Petal.Length, color=Species)) + 
+  theme_void() +
+  axes_3D() +
+  stat_3D()
+
+```
+
+```{r}
+ggplot(data, aes(x=x, y=y, z=z)) + 
+  theme_void() +
+  axes_3D() +
+  stat_3D()
+
+```
+
+The last three plots give a visualization of the data, The first plot shows that the data is spread in the x-y plane and partly in the z axis, the second plot for the other set of data shows that the points are spread mostly in the x-y plane. This gives a intuition about what can be the Principal components. Next we shall apply "prcomp()" to find out the PCs and the the scree plot for both the set of datas. 
+
+```{r}
+library(factoextra)
+pc=prcomp(data, scale= FALSE)
+pc
+```
+```{r}
+pc1=princomp(data, scores = TRUE) #using princomp
+pc1
+
+```
+```{r}
+names(pc1)
+```
+
+
+```{r}
+names(pc)
+
+```
+
+We see that both prcomp and princomp gives nearly the same values. x in prcomp are the scores in primcomp. 
+
+```{r}
+pc_plotdata=data.frame(v=pc$sdev)^2
+ggplot(data=pc_plotdata)+
+  geom_col(mapping = aes(x=c(1,2,3), y=v)) #same as bar taking stat= "identity by default
+```
+
+```{r}
+fviz_eig(pc, addlabels = TRUE)
+```
+
+```{r}
+fviz_screeplot(pc, choice="eigenvalue", 
+               barfill= "blue", addlabels= TRUE)
+```
+Now working with IRIS dataset. 
+
+
+```{r}
+iris1=iris[-5]
+pc=prcomp(iris1, scale= FALSE)
+pc
+
+```
+
+```{r}
+pc1=princomp(iris1, scores = TRUE) #using princomp
+pc1
+
+```
+
+```{r}
+fviz_screeplot(pc1, choice="eigenvalue", 
+               barfill= "blue", addlabels= TRUE)
+
+```
+
+>>>>>>> 070bcfd1bab3ae7e82abcb0f9125249300a35b87
